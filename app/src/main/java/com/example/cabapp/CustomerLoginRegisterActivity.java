@@ -3,6 +3,7 @@ package com.example.cabapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -14,6 +15,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -24,6 +27,8 @@ public class CustomerLoginRegisterActivity extends AppCompatActivity {
     private EditText emailCustomer,pswdCustomer;
     private FirebaseAuth m_Auth;
     private ProgressDialog loadingBar;
+    private String onlineCustomerID;
+    private DatabaseReference customerDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +40,7 @@ public class CustomerLoginRegisterActivity extends AppCompatActivity {
         registerButton=findViewById(R.id.registerBtnCustomer);
         emailCustomer=findViewById(R.id.emailCustomer);
         pswdCustomer=findViewById(R.id.passwordCustomer);
+
         m_Auth=FirebaseAuth.getInstance();
         loadingBar=new ProgressDialog(this);
 
@@ -86,6 +92,12 @@ public class CustomerLoginRegisterActivity extends AppCompatActivity {
                         public void onComplete(Task<AuthResult> task) {
                             if (task.isSuccessful())
                             {
+                                onlineCustomerID =m_Auth.getCurrentUser().getUid();
+                                customerDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers").child(onlineCustomerID);
+                                customerDatabaseReference.setValue(true);
+
+                                Intent intent=new Intent(CustomerLoginRegisterActivity.this,CustomerMapActivity.class);
+                                startActivity(intent);
                                 loadingBar.dismiss();
                                 Toast.makeText(CustomerLoginRegisterActivity.this, "Customer Reg Successfully", Toast.LENGTH_SHORT).show();
                             }
@@ -118,6 +130,8 @@ public class CustomerLoginRegisterActivity extends AppCompatActivity {
                             {
                                 loadingBar.dismiss();
                                 Toast.makeText(CustomerLoginRegisterActivity.this, "Customer Login Successfully", Toast.LENGTH_SHORT).show();
+                                Intent intent=new Intent(CustomerLoginRegisterActivity.this,CustomerMapActivity.class);
+                                startActivity(intent);
                             }
                             else {
                                 loadingBar.dismiss();

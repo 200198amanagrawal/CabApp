@@ -25,13 +25,17 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-import java.time.Instant;
+import java.util.List;
 
 public class DriverMapActivity extends FragmentActivity implements OnMapReadyCallback ,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
@@ -45,6 +49,9 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private FirebaseAuth mAuth;
     private FirebaseUser mCurrentUser;
     private boolean currentLogOutDriverStatus=false;
+    private DatabaseReference assignedCustomerRef,assignedCustomerPickupRef;
+    private String driverID,customerID="";
+    private Marker customerMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +62,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         driverSettings=findViewById(R.id.driver_setting_btn);
         mAuth=FirebaseAuth.getInstance();
         mCurrentUser=mAuth.getCurrentUser();
+        driverID=mAuth.getCurrentUser().getUid();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -73,6 +81,59 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 discconectDriver();
                 mAuth.signOut();
                 logOutDriver();
+            }
+        });
+        
+         getAssignedCustomerRequest();
+    }
+
+    private void getAssignedCustomerRequest() {
+        assignedCustomerRef=FirebaseDatabase.getInstance().getReference().child("Users")
+                .child("Drivers").child(driverID).child("customerRideID");
+        assignedCustomerRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists())
+                {
+                    customerID=snapshot.getValue().toString();
+                    getAssignedCustomerPickUpLocation();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getAssignedCustomerPickUpLocation() {
+        assignedCustomerPickupRef=FirebaseDatabase.getInstance().getReference().child("Customers Request").child(customerID)
+                .child("l");
+        assignedCustomerPickupRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists())
+                {
+                    List<Object> customerLocationMap= (List<Object>) snapshot.getValue();
+                    double locationLat=0;
+                    double locationLong=0;
+                    if(customerLocationMap.get(0)!=null)
+                    {
+                        locationLat=Double.parseDouble(customerLocationMap.get(0).toString());
+                    }
+                    if(customerLocationMap.get(1)!=null)
+                    {
+                        locationLong=Double.parseDouble(customerLocationMap.get(1).toString());
+                    }
+                    LatLng driverLatLng=new LatLng(locationLat,locationLong);
+                    customerMarker =mMap.addMarker(new MarkerOptions().position(driverLatLng).title("Pickup Location"));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }
@@ -129,17 +190,33 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
     @Override
     public void onLocationChanged(Location location) {
-        mLastLocation = location;
-        LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
-
-        if(FirebaseAuth.getInstance().getCurrentUser()!=null)
+        if(getApplicationContext()!=null)
         {
-            String userID= FirebaseAuth.getInstance().getCurrentUser().getUid();
-            DatabaseReference driverAvailablityRef= FirebaseDatabase.getInstance().getReference().child("driversAvailable");
-            GeoFire geoFire=new GeoFire(driverAvailablityRef);
-            geoFire.setLocation(userID,new GeoLocation(location.getLatitude(),location.getLongitude()));
+            mLastLocation = location;
+            LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+
+            if(FirebaseAuth.getInstance().getCurrentUser()!=null)
+            {
+                String userID= FirebaseAuth.getInstance().getCurrentUser().getUid();
+                DatabaseReference driverAvailablityRef= FirebaseDatabase.getInstance().getReference().child("driversAvailable");
+                DatabaseReference driverWorkingRef= FirebaseDatabase.getInstance().getReference().child("driversWorking");
+                GeoFire geoFireAvaialable=new GeoFire(driverAvailablityRef);
+                GeoFire geoFireWorking=new GeoFire(driverWorkingRef);
+
+                //when the customer is not assigned then avaiable should be there otherwise working
+                switch (customerID){
+                    case "":
+                        geoFireWorking.removeLocation(userID);
+                        geoFireAvaialable.setLocation(userID,new GeoLocation(location.getLatitude(),location.getLongitude()));
+                        break;
+                    default:
+                        geoFireAvaialable.removeLocation(userID);
+                        geoFireWorking.setLocation(userID,new GeoLocation(location.getLatitude(),location.getLongitude()));
+                        break;
+                }
+            }
         }
     }
 

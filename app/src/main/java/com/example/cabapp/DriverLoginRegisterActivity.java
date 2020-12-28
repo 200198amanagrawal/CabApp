@@ -97,7 +97,7 @@ public class DriverLoginRegisterActivity extends AppCompatActivity {
                                 Intent intent=new Intent(DriverLoginRegisterActivity.this,DriverMapActivity.class);
                                 startActivity(intent);
                                 loadingBar.dismiss();
-                                Toast.makeText(DriverLoginRegisterActivity.this, "Customer Reg Successfully", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(DriverLoginRegisterActivity.this, "Driver Reg Successfully", Toast.LENGTH_SHORT).show();
 
                             }
                             else {

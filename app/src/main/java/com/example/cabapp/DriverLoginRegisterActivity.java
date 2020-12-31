@@ -94,11 +94,9 @@ public class DriverLoginRegisterActivity extends AppCompatActivity {
                                 driverDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(onlineDriverID);
                                 driverDatabaseReference.setValue(true);
 
-                                Intent intent=new Intent(DriverLoginRegisterActivity.this,DriverMapActivity.class);
+                                Intent intent = new Intent(DriverLoginRegisterActivity.this, SettingsActivity.class);
+                                intent.putExtra("type", "Drivers");
                                 startActivity(intent);
-                                loadingBar.dismiss();
-                                Toast.makeText(DriverLoginRegisterActivity.this, "Driver Reg Successfully", Toast.LENGTH_SHORT).show();
-
                             }
                             else {
                                 loadingBar.dismiss();

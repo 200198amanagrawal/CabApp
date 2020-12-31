@@ -96,10 +96,9 @@ public class CustomerLoginRegisterActivity extends AppCompatActivity {
                                 customerDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers").child(onlineCustomerID);
                                 customerDatabaseReference.setValue(true);
 
-                                Intent intent=new Intent(CustomerLoginRegisterActivity.this,CustomerMapActivity.class);
+                                Intent intent = new Intent(CustomerLoginRegisterActivity.this, SettingsActivity.class);
+                                intent.putExtra("type", "Customers");
                                 startActivity(intent);
-                                loadingBar.dismiss();
-                                Toast.makeText(CustomerLoginRegisterActivity.this, "Customer Reg Successfully", Toast.LENGTH_SHORT).show();
                             }
                             else {
                                 loadingBar.dismiss();

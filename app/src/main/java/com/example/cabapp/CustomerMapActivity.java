@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -38,9 +39,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CustomerMapActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
@@ -62,6 +66,8 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     private Marker driverMarker,PickUpMarker;
     private ValueEventListener driverLocationRefListener;
     private GeoQuery geoQuery;
+    private TextView txtName, txtPhone, txtCarName;
+    private CircleImageView profilePic;
     private RelativeLayout relativeLayout;
 
     @Override
@@ -73,6 +79,12 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         customerLogout = findViewById(R.id.customer_logout_btn);
         customerSettings = findViewById(R.id.customer_setting_btn);
         callACab = findViewById(R.id.customer_call_a_cab);
+
+        txtName = findViewById(R.id.name_driver);
+        txtPhone = findViewById(R.id.phone_driver);
+        txtCarName = findViewById(R.id.car_name_driver);
+        profilePic = findViewById(R.id.profile_image_driver);
+        relativeLayout = findViewById(R.id.rel1);
 
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
@@ -145,7 +157,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     }
 
                     callACab.setText("Call a Cab");
-                    //relativeLayout.setVisibility(View.GONE);
+                    relativeLayout.setVisibility(View.GONE);
 
                 } else {
                     requestType = true;
@@ -215,6 +227,10 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     double locationLat = 0;
                     double locationLong = 0;
                     callACab.setText("Driver Found");
+
+                    relativeLayout.setVisibility(View.VISIBLE);
+                    getAssignedDriverInformation();
+
                     if (driverLocationMap != null) {
                         if (driverLocationMap.get(0) != null) {
                             locationLat = Double.parseDouble(driverLocationMap.get(0).toString());
@@ -259,6 +275,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         Intent welcomeIntent = new Intent(CustomerMapActivity.this, WelcomeActivity.class);
         welcomeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(welcomeIntent);
+        finish();
     }
 
     @Override
@@ -333,5 +350,39 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    private void getAssignedDriverInformation()
+    {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                .child("Users").child("Drivers").child(driverID);
+
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                if (dataSnapshot.exists()  &&  dataSnapshot.getChildrenCount() > 0)
+                {
+                    String name = dataSnapshot.child("name").getValue().toString();
+                    String phone = dataSnapshot.child("phone").getValue().toString();
+                    String car = dataSnapshot.child("car").getValue().toString();
+
+                    txtName.setText(name);
+                    txtPhone.setText(phone);
+                    txtCarName.setText(car);
+
+                    if (dataSnapshot.hasChild("image"))
+                    {
+                        String image = dataSnapshot.child("image").getValue().toString();
+                        Picasso.get().load(image).into(profilePic);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }

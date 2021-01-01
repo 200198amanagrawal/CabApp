@@ -3,6 +3,7 @@
 
     android:layout_height="match_parent"
     android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".DriverMapActivity"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
@@ -26,4 +27,66 @@
         android:layout_marginLeft="190dp"
         android:layout_height="wrap_content"
         android:text="LogOut" />
+
+    <RelativeLayout
+        android:id="@+id/rel2"
+        android:background="@color/colorPrimaryDark"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:visibility="gone">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_image_customer"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@drawable/profile"
+            app:civ_border_width="2dp"
+            app:civ_border_color="#c880ff"
+            android:layout_marginStart="10dp"
+            android:padding="2dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="10dp"
+            android:layout_alignParentLeft="true" />
+
+        <TextView
+            android:id="@+id/name_customer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/profile_image_customer"
+            android:text="Customer Name"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginLeft="2dp" />
+
+        <TextView
+            android:id="@+id/phone_customer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/profile_image_customer"
+            android:text="Customerv Phone Number"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="14dp"
+            android:layout_marginTop="3dp"
+            android:layout_below="@+id/name_customer"
+            android:layout_marginStart="2dp"
+            android:layout_marginLeft="2dp" />
+
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:src="@drawable/phone"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="10dp"
+            android:layout_centerVertical="true"
+            app:tint="@android:color/black"
+            android:layout_alignParentRight="true" />
+
+    </RelativeLayout>
 </RelativeLayout>

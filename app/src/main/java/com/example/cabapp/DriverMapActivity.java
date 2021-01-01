@@ -12,6 +12,8 @@ import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
@@ -35,8 +37,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class DriverMapActivity extends FragmentActivity implements OnMapReadyCallback ,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
@@ -54,6 +59,9 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private String driverID,customerID="";
     private Marker customerMarker;
     private ValueEventListener AssignedCustomerPickUpRefListner;
+    private TextView txtName, txtPhone;
+    private CircleImageView profilePic;
+    private RelativeLayout relativeLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +73,11 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         mAuth=FirebaseAuth.getInstance();
         mCurrentUser=mAuth.getCurrentUser();
         driverID=mAuth.getCurrentUser().getUid();
+
+        txtName = findViewById(R.id.name_customer);
+        txtPhone = findViewById(R.id.phone_customer);
+        profilePic = findViewById(R.id.profile_image_customer);
+        relativeLayout = findViewById(R.id.rel2);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -109,6 +122,9 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 {
                     customerID=snapshot.getValue().toString();
                     getAssignedCustomerPickUpLocation();
+
+                    relativeLayout.setVisibility(View.VISIBLE);
+                    getAssignedCustomerInformation();
                 }
                 else
                 {
@@ -124,7 +140,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                         assignedCustomerPickupRef.removeEventListener(AssignedCustomerPickUpRefListner);
                     }
 
-                    //relativeLayout.setVisibility(View.GONE);
+                    relativeLayout.setVisibility(View.GONE);
                 }
             }
 
@@ -283,5 +299,37 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
             GeoFire geoFire=new GeoFire(driverAvailablityRef);
             geoFire.removeLocation(userID);
         }
+    }
+
+    private void getAssignedCustomerInformation()
+    {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                .child("Users").child("Customers").child(customerID);
+
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                if (dataSnapshot.exists()  &&  dataSnapshot.getChildrenCount() > 0)
+                {
+                    String name = dataSnapshot.child("name").getValue().toString();
+                    String phone = dataSnapshot.child("phone").getValue().toString();
+
+                    txtName.setText(name);
+                    txtPhone.setText(phone);
+
+                    if (dataSnapshot.hasChild("image"))
+                    {
+                        String image = dataSnapshot.child("image").getValue().toString();
+                        Picasso.get().load(image).into(profilePic);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }

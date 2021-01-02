@@ -63,7 +63,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     private double radius = 1;
     private Boolean driversFound = false, requestType = false;
     private String driverID;
-    private Marker driverMarker,PickUpMarker;
+    private Marker driverMarker, PickUpMarker;
     private ValueEventListener driverLocationRefListener;
     private GeoQuery geoQuery;
     private TextView txtName, txtPhone, txtCarName;
@@ -96,7 +96,6 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
-        mapFragment.getMapAsync(this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(CustomerMapActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_REQUEST_CODE);
@@ -106,8 +105,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
         customerSettings.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
                 Intent intent = new Intent(CustomerMapActivity.this, SettingsActivity.class);
                 intent.putExtra("type", "Customers");
                 startActivity(intent);
@@ -129,8 +127,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     requestType = false;
                     geoQuery.removeAllListeners();
                     driverWorkingRef.removeEventListener(driverLocationRefListener);
-                    if (driversFound != null)
-                    {
+                    if (driversFound != null) {
                         driverRef = FirebaseDatabase.getInstance().getReference()
                                 .child("Users").child("Drivers").child(driverID).child("customerRideID");
 
@@ -147,12 +144,10 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     GeoFire geoFire = new GeoFire(customerDatabaseRef);
                     geoFire.removeLocation(customerId);
 
-                    if (PickUpMarker != null)
-                    {
+                    if (PickUpMarker != null) {
                         PickUpMarker.remove();
                     }
-                    if (driverMarker != null)
-                    {
+                    if (driverMarker != null) {
                         driverMarker.remove();
                     }
 
@@ -249,13 +244,10 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     location2.setLongitude(locationLong);
 
                     float distance = location1.distanceTo(location2);
-                    if (distance < 90)
-                    {
+                    if (distance < 90) {
                         callACab.setText("Driver's Reached");
-                    }
-                    else
-                    {
-                        callACab.setText("Driver Found: " + distance+"m");
+                    } else {
+                        callACab.setText("Driver Found: " + distance + "m");
                     }
 
                     LatLng driverLatLng = new LatLng(locationLat, locationLong);
@@ -275,7 +267,6 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         Intent welcomeIntent = new Intent(CustomerMapActivity.this, WelcomeActivity.class);
         welcomeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(welcomeIntent);
-        finish();
     }
 
     @Override
@@ -305,9 +296,9 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(CustomerMapActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_REQUEST_CODE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleAPICLient, mLocationRequest, this);
     }
@@ -324,10 +315,12 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
     @Override
     public void onLocationChanged(Location location) {
-        mLastLocation = location;
-        LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+        if(getApplicationContext()!=null) {
+            mLastLocation = location;
+            LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+        }
     }
 
     @Override
@@ -340,16 +333,6 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                 Toast.makeText(this, "Please provide the perm", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
     }
 
     private void getAssignedDriverInformation()

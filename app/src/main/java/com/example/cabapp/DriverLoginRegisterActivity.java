@@ -66,7 +66,7 @@ public class DriverLoginRegisterActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String email=emailDriver.getText().toString();
                 String password=pswdDriver.getText().toString();
-                loginCustomer(email,password);
+                loginDriver(email,password);
             }
         });
     }
@@ -107,7 +107,7 @@ public class DriverLoginRegisterActivity extends AppCompatActivity {
         }
     }
 
-    private void loginCustomer(@NotNull String email, String password) {
+    private void loginDriver(@NotNull String email, String password) {
         if(email.isEmpty())
         {
             Toast.makeText(this, "Email should not be empty", Toast.LENGTH_SHORT).show();

@@ -51,6 +51,17 @@
             android:layout_alignParentLeft="true" />
 
         <TextView
+            android:id="@+id/customerDestination"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/profile_image_customer"
+            android:text="Destination"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="14dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginLeft="2dp" />
+        <TextView
             android:id="@+id/name_customer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -58,8 +69,8 @@
             android:text="Customer Name"
             android:textColor="@android:color/white"
             android:textStyle="bold"
-            android:textSize="16dp"
-            android:layout_marginTop="10dp"
+            android:textSize="14dp"
+            android:layout_marginTop="20dp"
             android:layout_marginStart="2dp"
             android:layout_marginLeft="2dp" />
 
@@ -68,11 +79,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/profile_image_customer"
-            android:text="Customerv Phone Number"
+            android:text="Customer Phone Number"
             android:textColor="@android:color/white"
             android:textStyle="bold"
             android:textSize="14dp"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="2dp"
             android:layout_below="@+id/name_customer"
             android:layout_marginStart="2dp"
             android:layout_marginLeft="2dp" />

@@ -101,6 +101,18 @@
         android:layout_marginLeft="190dp"
         android:layout_height="wrap_content"
         android:text="LogOut" />
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20sp"
+        android:layout_below="@+id/customer_setting_btn"
+        >
+        <fragment android:id="@+id/autocomplete_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+            />
+    </androidx.cardview.widget.CardView>
 
     <Button
         android:id="@+id/customer_call_a_cab"

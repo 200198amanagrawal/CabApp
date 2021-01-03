@@ -22,6 +22,7 @@ import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -32,6 +33,13 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -41,6 +49,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -69,12 +80,28 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     private TextView txtName, txtPhone, txtCarName;
     private CircleImageView profilePic;
     private RelativeLayout relativeLayout;
+    private String destination;
+    private static int AUTOCOMPLETE_REQUEST_CODE = 100;
+
+    // Set the fields to specify which types of place data to
+    // return after the user has made a selection.
+    List<Place.Field> fields = Arrays.asList(Place.Field.ADDRESS,Place.Field.LAT_LNG, Place.Field.NAME);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_map);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+
+        if (!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(), "AIzaSyCl_x2vVtTm-Z_o3l6hvZ8EJwVybtCZOyo");
+        }
+
+//        Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY,
+//                fields)
+//                .build(CustomerMapActivity.this);
+//        startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
 
         customerLogout = findViewById(R.id.customer_logout_btn);
         customerSettings = findViewById(R.id.customer_setting_btn);
@@ -112,6 +139,23 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
             }
         });
 
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        if (autocompleteFragment != null) {
+            autocompleteFragment.setPlaceFields(fields);
+            autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+                @Override
+                public void onPlaceSelected(@NotNull Place place) {
+                    destination = place.getName();
+                }
+
+                @Override
+                public void onError(@NotNull Status status) {
+
+                }
+            });
+        }
+
         customerLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,7 +173,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     driverWorkingRef.removeEventListener(driverLocationRefListener);
                     if (driversFound != null) {
                         driverRef = FirebaseDatabase.getInstance().getReference()
-                                .child("Users").child("Drivers").child(driverID).child("customerRideID");
+                                .child("Users").child("Drivers").child(driverID).child("customerRequest");
 
                         driverRef.removeValue();
 
@@ -167,7 +211,24 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                 }
             }
         });
+
+
     }
+//
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
+//            if (resultCode == RESULT_OK) {
+//                Place place = Autocomplete.getPlaceFromIntent(data);
+//            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
+//                Status status = Autocomplete.getStatusFromIntent(data);
+//            } else if (resultCode == RESULT_CANCELED) {
+//            }
+//            return;
+//        }
+//        super.onActivityResult(requestCode, resultCode, data);
+//    }
+
 
     private void getClosestDriver() {
         GeoFire geoFire = new GeoFire(driverAvailableDatabaseRef);
@@ -179,9 +240,11 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                 if (!driversFound && requestType) {
                     driversFound = true;
                     driverID = key;
-                    driverRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverID);
+                    driverRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverID)
+                    .child("customerRequest");
                     HashMap driverMap = new HashMap();
                     driverMap.put("customerRideID", userID);
+                    driverMap.put("destination",destination);
                     driverRef.updateChildren(driverMap);
                     gettingDriverLocation();
                     callACab.setText("Looking for driver location");
@@ -315,7 +378,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
     @Override
     public void onLocationChanged(Location location) {
-        if(getApplicationContext()!=null) {
+        if (getApplicationContext() != null) {
             mLastLocation = location;
             LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
             mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -335,17 +398,14 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         }
     }
 
-    private void getAssignedDriverInformation()
-    {
+    private void getAssignedDriverInformation() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
                 .child("Users").child("Drivers").child(driverID);
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-                if (dataSnapshot.exists()  &&  dataSnapshot.getChildrenCount() > 0)
-                {
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
                     String name = dataSnapshot.child("name").getValue().toString();
                     String phone = dataSnapshot.child("phone").getValue().toString();
                     String car = dataSnapshot.child("car").getValue().toString();
@@ -354,8 +414,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     txtPhone.setText(phone);
                     txtCarName.setText(car);
 
-                    if (dataSnapshot.hasChild("image"))
-                    {
+                    if (dataSnapshot.hasChild("image")) {
                         String image = dataSnapshot.child("image").getValue().toString();
                         Picasso.get().load(image).into(profilePic);
                     }

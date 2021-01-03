@@ -60,7 +60,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private String driverID,customerID="";
     private Marker customerMarker;
     private ValueEventListener AssignedCustomerPickUpRefListner;
-    private TextView txtName, txtPhone;
+    private TextView txtName, txtPhone,customerDestination;
     private CircleImageView profilePic;
     private RelativeLayout relativeLayout;
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -78,6 +78,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
         txtName = findViewById(R.id.name_customer);
         txtPhone = findViewById(R.id.phone_customer);
+        customerDestination=findViewById(R.id.customerDestination);
         profilePic = findViewById(R.id.profile_image_customer);
         relativeLayout = findViewById(R.id.rel2);
 
@@ -116,7 +117,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
     private void getAssignedCustomerRequest() {
         assignedCustomerRef=FirebaseDatabase.getInstance().getReference().child("Users")
-                .child("Drivers").child(driverID).child("customerRideID");
+                .child("Drivers").child(driverID).child("customerRequest").child("customerRideID");
         assignedCustomerRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -126,6 +127,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                     getAssignedCustomerPickUpLocation();
 
                     relativeLayout.setVisibility(View.VISIBLE);
+                    getAssignedCustomerDestination();
                     getAssignedCustomerInformation();
                 }
                 else
@@ -144,6 +146,30 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
                     relativeLayout.setVisibility(View.GONE);
                 }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getAssignedCustomerDestination() {
+        assignedCustomerRef=FirebaseDatabase.getInstance().getReference().child("Users")
+                .child("Drivers").child(driverID).child("customerRequest").child("destination");
+        assignedCustomerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists())
+                {
+                    String destination=snapshot.getValue().toString();
+                    customerDestination.setText("Destination: " +destination);
+                }
+                else {
+                    customerDestination.setText("Destination not provided");
+                }
+
             }
 
             @Override

@@ -7,6 +7,8 @@ import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,6 +56,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -82,6 +85,10 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     private RelativeLayout relativeLayout;
     private String destination;
     private static int AUTOCOMPLETE_REQUEST_CODE = 100;
+    private RadioGroup mRadioGroup;
+    private String mService;
+    private RadioButton radioButton;
+    private int selectedID;
 
     // Set the fields to specify which types of place data to
     // return after the user has made a selection.
@@ -95,7 +102,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
 
         if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), "AIzaSyCl_x2vVtTm-Z_o3l6hvZ8EJwVybtCZOyo");
+            Places.initialize(getApplicationContext(), "AIzaSyA7Be5NnYagvV0f3Fhh866N9CDTWK2kYXY");
         }
 
 //        Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY,
@@ -112,6 +119,8 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         txtCarName = findViewById(R.id.car_name_driver);
         profilePic = findViewById(R.id.profile_image_driver);
         relativeLayout = findViewById(R.id.rel1);
+        mRadioGroup=findViewById(R.id.radioGroupCustomer);
+        selectedID=mRadioGroup.getCheckedRadioButtonId();
 
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
@@ -238,16 +247,42 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
                 if (!driversFound && requestType) {
-                    driversFound = true;
-                    driverID = key;
-                    driverRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverID)
-                    .child("customerRequest");
-                    HashMap driverMap = new HashMap();
-                    driverMap.put("customerRideID", userID);
-                    driverMap.put("destination",destination);
-                    driverRef.updateChildren(driverMap);
-                    gettingDriverLocation();
-                    callACab.setText("Looking for driver location");
+                    DatabaseReference mDataBaseRef=FirebaseDatabase.getInstance().getReference().child("Users")
+                            .child("Drivers").child(key);
+                    mDataBaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
+                                Map<String,Object> driverMap= (Map<String, Object>) dataSnapshot.getValue();
+                                if(driversFound)
+                                {
+                                    return;
+                                }
+                                selectedID = mRadioGroup.getCheckedRadioButtonId();
+                                radioButton=findViewById(selectedID);
+                                mService=radioButton.getText().toString();
+                                if(driverMap.get("service").equals(mService))
+                                {
+                                    driversFound = true;
+                                    driverID = dataSnapshot.getKey();
+                                    driverRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverID)
+                                            .child("customerRequest");
+                                    HashMap driverMapData = new HashMap();
+                                    driverMapData.put("customerRideID", userID);
+                                    driverMapData.put("destination",destination);
+                                    driverRef.updateChildren(driverMapData);
+                                    gettingDriverLocation();
+                                    callACab.setText("Looking for driver location");
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
                 }
             }
 

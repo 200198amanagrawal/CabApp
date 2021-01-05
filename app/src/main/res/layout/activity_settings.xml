@@ -112,5 +112,36 @@
         android:layout_marginTop="15dp"
         android:visibility="gone"
         />
+    <RadioGroup
+        android:layout_below="@id/driver_car_name"
+        android:layout_width="match_parent"
+        android:id="@+id/radioGroup"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone">
 
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="UberBlack"
+            android:id="@+id/UberBlack"
+            />
+
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="UberXL"
+            android:id="@+id/UberXL"
+            />
+
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="UberX"
+            android:id="@+id/UberX"
+            />
+
+    </RadioGroup>
 </RelativeLayout>

@@ -38,6 +38,7 @@ dependencies {
     implementation 'org.jetbrains:annotations-java5:15.0'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation "androidx.cardview:cardview:1.0.0"
+    implementation "com.github.jd-alexander:library:1.1.0"
     implementation 'com.google.android.libraries.places:places:2.4.0'
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
     implementation 'com.squareup.picasso:picasso:2.71828'

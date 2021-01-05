@@ -11,6 +11,8 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +52,10 @@ public class SettingsActivity extends AppCompatActivity {
     private String myUrl = "";
     private StorageTask uploadTask;
     private StorageReference storageProfilePicsRef;
+    private RadioGroup mRadioGroup;
+    private String mService;
+    private RadioButton radioButton;
+    private int selectedID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,11 +76,13 @@ public class SettingsActivity extends AppCompatActivity {
 
         nameEditText = findViewById(R.id.name);
         phoneEditText = findViewById(R.id.phone_number);
+        mRadioGroup=findViewById(R.id.radioGroup);
 
         driverCarName = findViewById(R.id.driver_car_name);
         if (getType.equals("Drivers"))
         {
             driverCarName.setVisibility(View.VISIBLE);
+            mRadioGroup.setVisibility(View.VISIBLE);
         }
 
         closeButton = findViewById(R.id.close_button);
@@ -277,6 +285,14 @@ public class SettingsActivity extends AppCompatActivity {
             if (getType.equals("Drivers"))
             {
                 userMap.put("car", driverCarName.getText().toString());
+                selectedID=mRadioGroup.getCheckedRadioButtonId();
+                CharSequence text = radioButton.getText();
+                if(text==null)
+                {
+                    return;
+                }
+                mService=text.toString();
+                userMap.put("service",mService);
             }
 
             databaseReference.child(mAuth.getCurrentUser().getUid()).updateChildren(userMap);
@@ -312,7 +328,20 @@ public class SettingsActivity extends AppCompatActivity {
                     if (getType.equals("Drivers"))
                     {
                         String car = dataSnapshot.child("car").getValue().toString();
+                        String service = dataSnapshot.child("service").getValue().toString();
+                        switch (service){
+                            case "UberX":
+                                selectedID=R.id.UberX;
+                                break;
+                            case "UberXL":
+                                selectedID=R.id.UberXL;
+                                break;
+                            case "UberBlack":
+                                selectedID=R.id.UberBlack;
+                                break;
+                        }
                         driverCarName.setText(car);
+                        mRadioGroup.check(selectedID);
                     }
 
 

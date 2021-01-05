@@ -114,11 +114,45 @@
             />
     </androidx.cardview.widget.CardView>
 
+    <RadioGroup
+
+        android:layout_width="match_parent"
+        android:id="@+id/radioGroupCustomer"
+        android:layout_alignBottom="@+id/map"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="UberBlack"
+            android:id="@+id/UberBlackChoice"
+            />
+
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="UberXL"
+            android:id="@+id/UberXLChoice"
+            />
+
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="UberX"
+            android:id="@+id/UberXChoice"
+            android:checked="true"
+            />
+
+    </RadioGroup>
     <Button
         android:id="@+id/customer_call_a_cab"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/map"
+        android:layout_below="@+id/radioGroupCustomer"
         android:layout_marginBottom="-48dp"
         android:text="Call a Cab" />
 </RelativeLayout>

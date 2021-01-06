@@ -286,6 +286,7 @@ public class SettingsActivity extends AppCompatActivity {
             {
                 userMap.put("car", driverCarName.getText().toString());
                 selectedID=mRadioGroup.getCheckedRadioButtonId();
+                radioButton=findViewById(selectedID);
                 CharSequence text = radioButton.getText();
                 if(text==null)
                 {

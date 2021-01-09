@@ -10,6 +10,7 @@ android {
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -42,4 +43,5 @@ dependencies {
     implementation 'com.google.android.libraries.places:places:2.4.0'
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
     implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.android.support:multidex:1.0.3'
 }

@@ -13,20 +13,34 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/driver_setting_btn"/>
+        android:layout_below="@id/buttonsLinearLayoutDriver"/>
 
-    <Button
-        android:id="@+id/driver_setting_btn"
-        android:layout_width="190dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Settings" />
+        android:orientation="horizontal"
+        android:id="@+id/buttonsLinearLayoutDriver">
+        <Button
+            android:id="@+id/driver_setting_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Settings"/>
 
-    <Button
-        android:id="@+id/driver_logout_btn"
-        android:layout_width="200dp"
-        android:layout_marginLeft="190dp"
-        android:layout_height="wrap_content"
-        android:text="LogOut" />
+        <Button
+            android:id="@+id/driver_logout_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="LogOut" />
+        <Button
+            android:id="@+id/historyDriver"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="History" />
+    </LinearLayout>
+
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

@@ -67,7 +67,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     private String userID = "";
     private LatLng customerPickupLocation;
     private SupportMapFragment mapFragment;
-    private Button customerLogout, customerSettings, callACab;
+    private Button customerLogout, customerSettings, callACab,mHistory;
     private FirebaseAuth mAuth;
     private FirebaseUser mCurrentUser;
     private DatabaseReference customerDatabaseRef, driverAvailableDatabaseRef, driverRef, driverWorkingRef;
@@ -88,10 +88,6 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     private LatLng destinationLatLng;
     private DatabaseReference driveHasEndedRef;
     private ValueEventListener driveHasEndedRefListener;
-    private Boolean requestBol = false;
-
-    // Set the fields to specify which types of place data to
-    // return after the user has made a selection.
     List<Place.Field> fields = Arrays.asList(Place.Field.ADDRESS,Place.Field.LAT_LNG, Place.Field.NAME);
 
 
@@ -116,6 +112,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         txtCarName = findViewById(R.id.car_name_driver);
         profilePic = findViewById(R.id.profile_image_driver);
         relativeLayout = findViewById(R.id.rel1);
+        mHistory =  findViewById(R.id.history);
         mRadioGroup=findViewById(R.id.radioGroupCustomer);
         selectedID=mRadioGroup.getCheckedRadioButtonId();
 
@@ -163,6 +160,16 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
             });
         }
 
+        mHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CustomerMapActivity.this, HistoryActivity.class);
+                intent.putExtra("customerOrDriver", "Customers");
+                startActivity(intent);
+                return;
+            }
+        });
+        
         customerLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -175,43 +182,14 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
             @Override
             public void onClick(View v) {
                 if (requestType) {
-                    requestType = false;
-                    geoQuery.removeAllListeners();
-                    driverWorkingRef.removeEventListener(driverLocationRefListener);
-                    if (driverFound != null) {
-                        driverRef = FirebaseDatabase.getInstance().getReference()
-                                .child("Users").child("Drivers").child(driverID).child("customerRequest");
-
-                        driverRef.removeValue();
-
-                        driverID = null;
-                    }
-
-                    driverFound = false;
-                    radius = 1;
-
-                    String customerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-                    GeoFire geoFire = new GeoFire(customerDatabaseRef);
-                    geoFire.removeLocation(customerId);
-
-                    if (PickUpMarker != null) {
-                        PickUpMarker.remove();
-                    }
-                    if (driverMarker != null) {
-                        driverMarker.remove();
-                    }
-
-                    callACab.setText("Call a Cab");
-                    relativeLayout.setVisibility(View.GONE);
-
+                    endRide();
                 } else {
                     requestType = true;
 
                     GeoFire geoFire = new GeoFire(customerDatabaseRef);
                     geoFire.setLocation(userID, new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
                     customerPickupLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                    PickUpMarker = mMap.addMarker(new MarkerOptions().position(customerPickupLocation).title("My Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.user)));
+                    PickUpMarker = mMap.addMarker(new MarkerOptions().position(customerPickupLocation).title("My Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.pin)));
 
                     callACab.setText("Fetching Drivers ...");
                     getClosestDriver();
@@ -467,24 +445,28 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     }
 
     private void endRide(){
-        requestBol = false;
+
+        requestType = false;
         geoQuery.removeAllListeners();
-        driverRef.removeEventListener(driverLocationRefListener);
+        driverWorkingRef.removeEventListener(driverLocationRefListener);
         driveHasEndedRef.removeEventListener(driveHasEndedRefListener);
 
-        if (driverID != null){
-            DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverID).child("customerRequest");
-            driverRef.removeValue();
-            driverID = null;
+        if (driverFound != null) {
+            driverRef = FirebaseDatabase.getInstance().getReference()
+                    .child("Users").child("Drivers").child(driverID).child("customerRequest");
 
+            driverRef.removeValue();
+
+            driverID = null;
         }
+
         driverFound = false;
         radius = 1;
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("customerRequest");
-        GeoFire geoFire = new GeoFire(ref);
-        geoFire.removeLocation(userId);
+        String customerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        GeoFire geoFire = new GeoFire(customerDatabaseRef);
+        geoFire.removeLocation(customerId);
 
         if(PickUpMarker != null){
             PickUpMarker.remove();
@@ -495,9 +477,13 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         callACab.setText("call Uber");
 
         relativeLayout.setVisibility(View.GONE);
-        txtName.setText("");
-        txtPhone.setText("");
-        txtCarName.setText("Destination: --");
-        profilePic.setImageResource(R.drawable.profile);
+    }
+
+    @Override
+    public void onBackPressed(){
+        Intent a = new Intent(Intent.ACTION_MAIN);
+        a.addCategory(Intent.CATEGORY_HOME);
+        a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(a);
     }
 }

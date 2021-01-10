@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -129,16 +130,16 @@ public class HistorySingleActivity extends AppCompatActivity implements OnMapRea
                             if(!driverId.equals(currentUserId)){
                                 userDriverOrCustomer = "Customers";
                                 getUserInformation("Drivers", driverId);
-                               // displayCustomerRelatedObjects();
+                                displayCustomerRelatedObjects();
                             }
                         }
                         if (child.getKey().equals("timestamp")){
                             rideDate.setText(getDate(Long.valueOf(child.getValue().toString())));
                         }
-//                        if (child.getKey().equals("rating")){
-//                            mRatingBar.setRating(Integer.valueOf(child.getValue().toString()));
-//
-//                        }
+                        if (child.getKey().equals("rating")){
+                            mRatingBar.setRating(Integer.valueOf(child.getValue().toString()));
+
+                        }
 //                        if (child.getKey().equals("customerPaid")){
 //                            customerPaid =true;
 //                        }
@@ -287,4 +288,26 @@ public class HistorySingleActivity extends AppCompatActivity implements OnMapRea
         }
     }
 
+    private void displayCustomerRelatedObjects() {
+        mRatingBar.setVisibility(View.VISIBLE);
+        mRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                historyRideInfoDb.child("rating").setValue(rating);
+                DatabaseReference mDriverRatingDb = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverId).child("rating");
+                mDriverRatingDb.child(rideId).setValue(rating);
+            }
+        });
+//        if(customerPaid){
+//            mPay.setEnabled(false);
+//        }else{
+//            mPay.setEnabled(true);
+//        }
+//        mPay.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                payPalPayment();
+//            }
+//        });
+    }
 }

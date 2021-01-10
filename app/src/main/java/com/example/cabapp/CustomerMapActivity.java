@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -89,6 +90,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     private DatabaseReference driveHasEndedRef;
     private ValueEventListener driveHasEndedRefListener;
     List<Place.Field> fields = Arrays.asList(Place.Field.ADDRESS,Place.Field.LAT_LNG, Place.Field.NAME);
+    private RatingBar mRatingBar;
 
 
     @Override
@@ -122,6 +124,8 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         customerDatabaseRef = FirebaseDatabase.getInstance().getReference().child("Customers Request");
         driverAvailableDatabaseRef = FirebaseDatabase.getInstance().getReference().child("driversAvailable");
         driverWorkingRef = FirebaseDatabase.getInstance().getReference().child("driversWorking");
+
+        mRatingBar =  findViewById(R.id.ratingBarCustomer);
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -417,6 +421,18 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     if (dataSnapshot.hasChild("image")) {
                         String image = dataSnapshot.child("image").getValue().toString();
                         Picasso.get().load(image).into(profilePic);
+                    }
+
+                    int ratingSum = 0;
+                    float ratingsTotal = 0;
+                    float ratingsAvg = 0;
+                    for (DataSnapshot child : dataSnapshot.child("rating").getChildren()){
+                        ratingSum = ratingSum + Integer.valueOf(child.getValue().toString());
+                        ratingsTotal++;
+                    }
+                    if(ratingsTotal!= 0){
+                        ratingsAvg = ratingSum/ratingsTotal;
+                        mRatingBar.setRating(ratingsAvg);
                     }
                 }
             }

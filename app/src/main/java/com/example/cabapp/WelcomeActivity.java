@@ -17,6 +17,9 @@ public class WelcomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_welcome);
         driverLoginButton=findViewById(R.id.welcome_driver);
         customerLoginButton=findViewById(R.id.welcome_customer);
+
+        startService(new Intent(WelcomeActivity.this, onAppKilled.class));
+
         customerLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

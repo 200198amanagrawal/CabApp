@@ -108,7 +108,6 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
-        assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
         driverSettings.setOnClickListener(new View.OnClickListener() {

@@ -11,9 +11,9 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
@@ -41,9 +41,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     private CircleImageView profileImageView;
     private EditText nameEditText, phoneEditText, driverCarName;
+    private LinearLayout linearLayoutCarName;
     private ImageView closeButton, saveButton;
-    private TextView profileChangeBtn;
-
     private DatabaseReference databaseReference;
     private FirebaseAuth mAuth;
 
@@ -79,16 +78,16 @@ public class SettingsActivity extends AppCompatActivity {
         mRadioGroup=findViewById(R.id.radioGroup);
 
         driverCarName = findViewById(R.id.driver_car_name);
+        linearLayoutCarName =findViewById(R.id.linearLayoutCarName);
         if (getType.equals("Drivers"))
         {
-            driverCarName.setVisibility(View.VISIBLE);
+            linearLayoutCarName.setVisibility(View.VISIBLE);
             mRadioGroup.setVisibility(View.VISIBLE);
         }
 
         closeButton = findViewById(R.id.close_button);
         saveButton = findViewById(R.id.save_button);
 
-        profileChangeBtn = findViewById(R.id.change_picture_btn);
 
 
 
@@ -122,7 +121,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        profileChangeBtn.setOnClickListener(new View.OnClickListener() {
+        profileImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view)
             {

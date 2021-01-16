@@ -4,80 +4,137 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login"
+    android:background="@color/colorPrimary"
     tools:context=".CustomerLoginRegisterActivity">
 
-    <TextView
-        android:id="@+id/customerLoginText"
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:layout_marginStart="117dp"
-        android:layout_marginLeft="117dp"
-        android:layout_marginTop="220dp"
-        android:text="Customer's login"
-        android:textColor="@android:color/background_light"
-        android:textSize="25sp"
-        android:textStyle="bold"
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="40dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/usermarker"
+        app:tint="#000000" />
+
+    <TextView
+        android:id="@+id/loginTextCustomer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="198dp"
+        android:fontFamily="@font/faster_one"
+        android:text="Customer's Login"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
+        android:background="#00000000"
+        android:layout_marginTop="268dp"
+        app:layout_constraintEnd_toEndOf="@+id/loginTextCustomer"
+        app:layout_constraintStart_toStartOf="@+id/loginTextCustomer"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/loginicon" />
+
+        <EditText
+            android:id="@+id/emailCustomer"
+            android:layout_width="230dp"
+            android:layout_height="35dp"
+            android:background="#00000000"
+            android:ems="10"
+            android:hint="Username"
+            android:inputType="textPersonName"
+            android:textSize="16dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
+        android:background="#00000000"
+        android:layout_marginTop="318dp"
+        app:layout_constraintEnd_toEndOf="@+id/loginTextCustomer"
+        app:layout_constraintStart_toStartOf="@+id/loginTextCustomer"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/passwordicon" />
+
+        <EditText
+            android:id="@+id/passwordCustomer"
+            android:layout_width="230dp"
+            android:layout_height="35dp"
+            android:ems="10"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:background="#00000000"
+            android:textSize="16dp" />
+
+    </LinearLayout>
+
     <Button
         android:id="@+id/loginBtnCustomer"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="380dp"
+        android:alpha="0.75"
+        android:background="@drawable/loginbuttonlayout"
         android:text="Login"
-        app:layout_constraintEnd_toEndOf="@+id/passwordCustomer"
-        app:layout_constraintHorizontal_bias="0.461"
-        app:layout_constraintStart_toStartOf="@+id/passwordCustomer"
-        app:layout_constraintTop_toBottomOf="@+id/passwordCustomer" />
-
-    <EditText
-        android:id="@+id/emailCustomer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="52dp"
-        android:ems="10"
-        android:inputType="textEmailAddress"
-        app:layout_constraintEnd_toEndOf="@+id/customerLoginText"
-        app:layout_constraintHorizontal_bias="0.555"
-        app:layout_constraintStart_toStartOf="@+id/customerLoginText"
-        app:layout_constraintTop_toTopOf="@+id/customerLoginText" />
-
-    <EditText
-        android:id="@+id/passwordCustomer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="68dp"
-        android:ems="10"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="@+id/emailCustomer"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/emailCustomer"
-        app:layout_constraintTop_toTopOf="@+id/emailCustomer" />
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.78"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/frgtpswdCustomer"
+        android:id="@+id/forgotPswdCustomer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="24dp"
         android:text="Forgot Password?"
-        app:layout_constraintEnd_toEndOf="@+id/loginBtnCustomer"
-        app:layout_constraintHorizontal_bias="0.447"
-        app:layout_constraintStart_toStartOf="@+id/loginBtnCustomer"
-        app:layout_constraintTop_toTopOf="@+id/loginBtnCustomer" />
+        app:layout_constraintEnd_toStartOf="@+id/loginBtnCustomer"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout3" />
 
-    <Button
-        android:id="@+id/registerBtnCustomer"
-        android:layout_width="200dp"
+    <LinearLayout
+        android:background="@drawable/loginbuttonlayout"
+        android:layout_width="260dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Register"
+        android:layout_marginTop="152dp"
         app:layout_constraintEnd_toEndOf="@+id/loginBtnCustomer"
-        app:layout_constraintHorizontal_bias="0.464"
-        app:layout_constraintStart_toStartOf="@+id/loginBtnCustomer"
-        app:layout_constraintTop_toTopOf="@+id/frgtpswdCustomer" />
+        app:layout_constraintHorizontal_bias="0.437"
+        app:layout_constraintStart_toStartOf="@+id/linearLayout3"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+
+        <Button
+            android:id="@+id/registerBtnCustomer"
+            android:layout_width="210dp"
+            android:layout_height="40dp"
+            android:alpha="0.8"
+            android:text="Register"
+            android:background="#00000000"
+            android:textColor="@color/colorPrimary" />
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="2dp"
+            android:src="@drawable/signupicon"/>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,88 +4,135 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login"
+    android:background="@color/colorPrimary"
     tools:context=".DriverLoginRegisterActivity">
 
-    <TextView
-        android:id="@+id/driverLoginText"
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_marginStart="117dp"
-        android:layout_marginLeft="117dp"
-        android:layout_marginTop="220dp"
-        android:text="Driver's login"
-        android:textColor="@android:color/background_light"
-        android:textSize="20sp"
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="40dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.101"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/taxisymbol" />
+
+    <TextView
+        android:id="@+id/loginTextDriver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="198dp"
+        android:fontFamily="@font/faster_one"
+        android:text="Driver's Login"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/emailDriver"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:ems="10"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/driverLoginText" />
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
+        android:background="#00000000"
+        android:layout_marginTop="268dp"
+        app:layout_constraintEnd_toEndOf="@+id/loginTextDriver"
+        app:layout_constraintStart_toStartOf="@+id/loginTextDriver"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <EditText
-        android:id="@+id/pswdDriver"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:ems="10"
-        android:hint="Password"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/emailDriver" />
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/loginicon" />
+
+        <EditText
+            android:id="@+id/emailDriver"
+            android:layout_width="230dp"
+            android:layout_height="35dp"
+            android:background="#00000000"
+            android:ems="10"
+            android:hint="Username"
+            android:inputType="textPersonName"
+            android:textSize="16dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="250dp"
+        android:layout_height="35dp"
+        android:background="#00000000"
+        android:layout_marginTop="318dp"
+        app:layout_constraintEnd_toEndOf="@+id/loginTextDriver"
+        app:layout_constraintStart_toStartOf="@+id/loginTextDriver"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/passwordicon" />
+
+        <EditText
+            android:id="@+id/pswdDriver"
+            android:layout_width="230dp"
+            android:layout_height="40dp"
+            android:ems="10"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:background="#00000000"
+            android:textSize="16dp" />
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/loginDriver"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="380dp"
+        android:alpha="0.75"
+        android:background="@drawable/loginbuttonlayout"
         android:text="Login"
-        app:layout_constraintEnd_toEndOf="@+id/pswdDriver"
-        app:layout_constraintStart_toStartOf="@+id/pswdDriver"
-        app:layout_constraintTop_toBottomOf="@+id/pswdDriver" />
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.78"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/forgotPswdDriver"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="68dp"
-        android:text="Forgot the Password?"
-        app:layout_constraintEnd_toEndOf="@+id/loginDriver"
-        app:layout_constraintHorizontal_bias="0.433"
-        app:layout_constraintStart_toStartOf="@+id/loginDriver"
-        app:layout_constraintTop_toTopOf="@+id/loginDriver" />
-
-    <Button
-        android:id="@+id/registerDriver"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
         android:layout_marginTop="36dp"
-        android:text="Register Account"
+        android:layout_marginEnd="24dp"
+        android:text="Forgot Password?"
+        app:layout_constraintEnd_toStartOf="@+id/loginDriver"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout3" />
+
+    <LinearLayout
+        android:background="@drawable/loginbuttonlayout"
+        android:layout_width="260dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="152dp"
         app:layout_constraintEnd_toEndOf="@+id/loginDriver"
-        app:layout_constraintStart_toStartOf="@+id/loginDriver"
-        app:layout_constraintTop_toTopOf="@+id/forgotPswdDriver" />
+        app:layout_constraintHorizontal_bias="0.437"
+        app:layout_constraintStart_toStartOf="@+id/linearLayout3"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+
+        <Button
+            android:id="@+id/registerDriver"
+            android:layout_width="210dp"
+            android:layout_height="40dp"
+            android:alpha="0.8"
+            android:text="Register"
+            android:background="#00000000"
+            android:textColor="@color/colorPrimary" />
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="2dp"
+            android:src="@drawable/signupicon"/>
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

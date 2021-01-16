@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class CustomerLoginRegisterActivity extends AppCompatActivity {
 
-    private TextView customerLoginText,forgotPswd;
     private Button loginButton,registerButton;
     private EditText emailCustomer,pswdCustomer;
     private FirebaseAuth m_Auth;
@@ -34,8 +33,6 @@ public class CustomerLoginRegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_login_register);
-        customerLoginText =findViewById(R.id.customerLoginText);
-        forgotPswd=findViewById(R.id.frgtpswdCustomer);
         loginButton=findViewById(R.id.loginBtnCustomer);
         registerButton=findViewById(R.id.registerBtnCustomer);
         emailCustomer=findViewById(R.id.emailCustomer);
@@ -43,17 +40,6 @@ public class CustomerLoginRegisterActivity extends AppCompatActivity {
 
         m_Auth=FirebaseAuth.getInstance();
         loadingBar=new ProgressDialog(this);
-
-        registerButton.setVisibility(View.GONE);
-        forgotPswd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                customerLoginText.setText("Customer's Reg");
-                loginButton.setVisibility(View.GONE);
-                forgotPswd.setVisibility(View.GONE);
-                registerButton.setVisibility(View.VISIBLE);
-            }
-        });
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override

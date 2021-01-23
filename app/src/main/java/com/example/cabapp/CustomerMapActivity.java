@@ -6,8 +6,10 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.location.Location;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
@@ -17,7 +19,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 
 import com.firebase.geofire.GeoFire;
@@ -42,6 +49,8 @@ import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -70,7 +79,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     private String userID = "";
     private LatLng customerPickupLocation;
     private SupportMapFragment mapFragment;
-    private Button customerLogout, customerSettings, callACab,mHistory;
+    private Button callACab;
     private FirebaseAuth mAuth;
     private FirebaseUser mCurrentUser;
     private DatabaseReference customerDatabaseRef, driverAvailableDatabaseRef, driverRef, driverWorkingRef;
@@ -83,6 +92,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     private TextView txtName, txtPhone, txtCarName;
     private CircleImageView profilePic;
     private RelativeLayout relativeLayout;
+    private CoordinatorLayout coordinatorLayout,coordinatorLayoutCarSel;
     private String destination;
     private RadioGroup mRadioGroup;
     private String mService;
@@ -93,6 +103,12 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     private ValueEventListener driveHasEndedRefListener;
     List<Place.Field> fields = Arrays.asList(Place.Field.ADDRESS,Place.Field.LAT_LNG, Place.Field.NAME);
     private RatingBar mRatingBar;
+    private BottomSheetBehavior bottomSheetBehavior,bottomSheetBehaviorDriverInfo;
+    private ImageView topDownImage,topDownImageDriverInfo;
+    private NavigationView nav;
+    private ActionBarDrawerToggle toggle;
+    private DrawerLayout drawerLayout;
+    private Toolbar toolbar;
 
 
     @Override
@@ -102,13 +118,51 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
         destinationLatLng = new LatLng(0.0,0.0);
 
-
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), "AIzaSyA7Be5NnYagvV0f3Fhh866N9CDTWK2kYXY");
         }
 
-        customerLogout = findViewById(R.id.customer_logout_btn);
-        customerSettings = findViewById(R.id.customer_setting_btn);
+        toolbar= findViewById(R.id.toolbar_customer);
+
+        nav=findViewById(R.id.navmenu_customer);
+        drawerLayout=findViewById(R.id.drawer_customer);
+
+        toggle=new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.open,R.string.close);
+
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        nav.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem)
+            {
+                switch (menuItem.getItemId())
+                {
+                    case R.id.menu_history :
+                        Intent intent = new Intent(CustomerMapActivity.this, HistoryActivity.class);
+                        intent.putExtra("customerOrDriver", "Customers");
+                        startActivity(intent);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        break;
+
+                    case R.id.menu_logout :
+                        mAuth.signOut();
+                        logOutCustomer();
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        break;
+
+                    case R.id.menu_setting :
+                        Intent intentSetting = new Intent(CustomerMapActivity.this, SettingsActivity.class);
+                        intentSetting.putExtra("type", "Customers");
+                        startActivity(intentSetting);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        break;
+                }
+
+                return true;
+            }
+        });
+
         callACab = findViewById(R.id.customer_call_a_cab);
 
         txtName = findViewById(R.id.name_driver);
@@ -116,8 +170,11 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         txtCarName = findViewById(R.id.car_name_driver);
         profilePic = findViewById(R.id.profile_image_driver);
         relativeLayout = findViewById(R.id.rel1);
-        mHistory =  findViewById(R.id.history);
+        coordinatorLayout=findViewById(R.id.coordinatorLayoutDriverInfo);
+        coordinatorLayoutCarSel=findViewById(R.id.coordinatorLayoutCarSelection);
         mRadioGroup=findViewById(R.id.radioGroupCustomer);
+        topDownImage=findViewById(R.id.topdownimage);
+        topDownImageDriverInfo=findViewById(R.id.topdownimageDriverInfo);
         selectedID=mRadioGroup.getCheckedRadioButtonId();
 
         mAuth = FirebaseAuth.getInstance();
@@ -139,14 +196,6 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
             mapFragment.getMapAsync(this);
         }
 
-        customerSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(CustomerMapActivity.this, SettingsActivity.class);
-                intent.putExtra("type", "Customers");
-                startActivity(intent);
-            }
-        });
 
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
@@ -165,24 +214,6 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                 }
             });
         }
-
-        mHistory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(CustomerMapActivity.this, HistoryActivity.class);
-                intent.putExtra("customerOrDriver", "Customers");
-                startActivity(intent);
-                return;
-            }
-        });
-        
-        customerLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mAuth.signOut();
-                logOutCustomer();
-            }
-        });
 
         callACab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -203,6 +234,51 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
             }
         });
 
+        View bottomSheet=findViewById(R.id.bottom_sheet_carsel);
+        bottomSheetBehavior=BottomSheetBehavior.from(bottomSheet);
+        bottomSheetBehavior.setPeekHeight(50);
+        bottomSheetBehavior.setHideable(true);
+
+        bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState)
+                {
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        topDownImage.setImageResource(R.drawable.down_arrow);
+                        break;
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        topDownImage.setImageResource(R.drawable.uparrow);
+                        break;
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
+        View bottomSheetDriverInfo=findViewById(R.id.bottom_sheet_driverinfo);
+        bottomSheetBehaviorDriverInfo=BottomSheetBehavior.from(bottomSheetDriverInfo);
+        bottomSheetBehaviorDriverInfo.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState)
+                {
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        topDownImageDriverInfo.setImageResource(R.drawable.down_arrow);
+                        break;
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        topDownImageDriverInfo.setImageResource(R.drawable.uparrow);
+                        break;
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
 
     }
 
@@ -293,6 +369,8 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     callACab.setText("Driver Found");
 
                     relativeLayout.setVisibility(View.VISIBLE);
+                    coordinatorLayout.setVisibility(View.VISIBLE);
+                    coordinatorLayoutCarSel.setVisibility(View.GONE);
                     getAssignedDriverInformation();
 
                     if (driverLocationMap != null) {
@@ -502,6 +580,8 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         callACab.setText("call Uber");
 
         relativeLayout.setVisibility(View.GONE);
+        coordinatorLayout.setVisibility(View.GONE);
+        coordinatorLayoutCarSel.setVisibility(View.VISIBLE);
     }
 
     @Override

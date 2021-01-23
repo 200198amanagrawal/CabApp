@@ -13,12 +13,15 @@ import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -46,6 +49,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -69,6 +73,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     SupportMapFragment mapFragment;
     private Button mRideStatus;
     private FirebaseAuth mAuth;
+    private LinearLayout linearLayout;
     private boolean currentLogOutDriverStatus = false;
     private DatabaseReference assignedCustomerRef, assignedCustomerPickupRef;
     private String driverID, customerID = "";
@@ -84,6 +89,8 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private String destination;
     private LatLng destinationLatLng, pickupLatLng;
     private float rideDistance;
+    private ImageView topDownImageCustomerInfo;
+    private BottomSheetBehavior bottomSheetBehaviorCustomerInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +111,8 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         customerDestination = findViewById(R.id.customerDestination);
         profilePic = findViewById(R.id.profile_image_customer);
         relativeLayout = findViewById(R.id.rel2);
-
+        topDownImageCustomerInfo =findViewById(R.id.topdownimageCustomerInfo);
+        linearLayout=findViewById(R.id.linearLayoutForCustomerPickup);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -143,7 +151,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                         if (destinationLatLng.latitude != 0.0 && destinationLatLng.longitude != 0.0) {
                             getRouteToMarker(destinationLatLng);
                         }
-                        mRideStatus.setText("drive completed");
+                        mRideStatus.setText("Is Drive Complete?");
 
                         break;
                     case 2:
@@ -161,6 +169,28 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 intent.putExtra("customerOrDriver", "Drivers");
                 startActivity(intent);
                 return;
+            }
+        });
+
+        View bottomSheetCustomerInfo=findViewById(R.id.bottom_sheet_Customerinfo);
+        bottomSheetBehaviorCustomerInfo = BottomSheetBehavior.from(bottomSheetCustomerInfo);
+        bottomSheetBehaviorCustomerInfo.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState)
+                {
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        topDownImageCustomerInfo.setImageResource(R.drawable.down_arrow);
+                        break;
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        topDownImageCustomerInfo.setImageResource(R.drawable.uparrow);
+                        break;
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
             }
         });
 
@@ -218,6 +248,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                     getAssignedCustomerPickUpLocation();
 
                     relativeLayout.setVisibility(View.VISIBLE);
+                    linearLayout.setVisibility(View.VISIBLE);
                     getAssignedCustomerDestination();
                     getAssignedCustomerInformation();
                 } else {
@@ -546,6 +577,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         }
 
         relativeLayout.setVisibility(View.GONE);
+        linearLayout.setVisibility(View.GONE);
     }
 
     @Override

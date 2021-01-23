@@ -61,7 +61,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        getType = getIntent().getStringExtra("type");
+        getType = getIntent().getExtras().get("type").toString();
         Toast.makeText(this, getType, Toast.LENGTH_SHORT).show();
 
 
@@ -89,7 +89,7 @@ public class SettingsActivity extends AppCompatActivity {
         saveButton = findViewById(R.id.save_button);
 
 
-
+        getUserInformation();
 
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,7 +133,6 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        getUserInformation();
     }
 
     @Override
@@ -277,7 +276,8 @@ public class SettingsActivity extends AppCompatActivity {
         else
         {
             HashMap<String, Object> userMap = new HashMap<>();
-            userMap.put("uid", mAuth.getCurrentUser().getUid());
+            String currentUser = mAuth.getCurrentUser().getUid();
+            userMap.put("uid", currentUser);
             userMap.put("name", nameEditText.getText().toString());
             userMap.put("phone", phoneEditText.getText().toString());
 
@@ -295,18 +295,30 @@ public class SettingsActivity extends AppCompatActivity {
                 userMap.put("service",mService);
             }
 
-            databaseReference.child(mAuth.getCurrentUser().getUid()).updateChildren(userMap);
-
-            if (getType.equals("Drivers"))
-            {
-                Toast.makeText(SettingsActivity.this, "Driver Reg Successfully", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(SettingsActivity.this, DriverMapActivity.class));
-            }
-            else
-            {
-                Toast.makeText(SettingsActivity.this, "Customer Reg Successfully", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(SettingsActivity.this, CustomerMapActivity.class));
-            }
+            databaseReference.child(currentUser).updateChildren(userMap).addOnCompleteListener(
+                    new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful())
+                            {
+                                if (getType.equals("Drivers"))
+                                {
+                                    Toast.makeText(SettingsActivity.this, "Driver Reg Successfully", Toast.LENGTH_SHORT).show();
+                                    startActivity(new Intent(SettingsActivity.this, DriverMapActivity.class));
+                                }
+                                else
+                                {
+                                    Toast.makeText(SettingsActivity.this, "Customer Reg Successfully", Toast.LENGTH_SHORT).show();
+                                    startActivity(new Intent(SettingsActivity.this, CustomerMapActivity.class));
+                                }
+                            }
+                            else
+                            {
+                                Toast.makeText(SettingsActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+            );
         }
     }
 

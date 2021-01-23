@@ -122,7 +122,6 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/relLayoutProfileImage"
                     android:background="#00000000"
-                    android:focusable="false"
                     android:hint="Name"
                     android:textSize="13dp" />
             </LinearLayout>

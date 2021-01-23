@@ -2,4 +2,6 @@
     <string name="app_name">CabApp</string>
     <string name="title_activity_driver_map">Map</string>
     <string name="title_activity_customer_map">Map</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
 </resources>

@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-
+<androidx.drawerlayout.widget.DrawerLayout
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".DriverMapActivity"
+    android:id="@+id/drawer_driver"
+    tools:openDrawer="start"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+<RelativeLayout
 
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    >
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/toolbar_driver"
+        android:background="@color/colorPrimary"
+        >
+    </androidx.appcompat.widget.Toolbar>
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -20,34 +32,10 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:id="@+id/buttonandswitch">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/buttonsLinearLayoutDriver">
-        <Button
-            android:id="@+id/driver_setting_btn"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Settings"/>
-
-        <Button
-            android:id="@+id/driver_logout_btn"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="LogOut" />
-        <Button
-            android:id="@+id/historyDriver"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="History" />
-    </LinearLayout>
         <Switch
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="end"
             android:text="Working"
             android:layout_margin="10sp"
             android:id="@+id/workingSwitch"/>
@@ -182,3 +170,13 @@
         android:id="@+id/rideStatus"/>
 </LinearLayout>
 </RelativeLayout>
+    <com.google.android.material.navigation.NavigationView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/navmenu_driver"
+        app:menu="@menu/iconmenu"
+        app:headerLayout="@layout/navheader"
+        android:layout_gravity="start"
+        android:background="@color/colorPrimaryDark"
+        />
+    </androidx.drawerlayout.widget.DrawerLayout>

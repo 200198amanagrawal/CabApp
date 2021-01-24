@@ -89,8 +89,8 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     private Marker driverMarker, PickUpMarker;
     private ValueEventListener driverLocationRefListener;
     private GeoQuery geoQuery;
-    private TextView txtName, txtPhone, txtCarName;
-    private CircleImageView profilePic;
+    private TextView txtName, txtPhone, txtCarName,navTextName;
+    private CircleImageView profilePic,navProfilePic;
     private RelativeLayout relativeLayout;
     private CoordinatorLayout coordinatorLayout,coordinatorLayoutCarSel;
     private String destination;
@@ -125,12 +125,17 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         toolbar= findViewById(R.id.toolbar_customer);
 
         nav=findViewById(R.id.navmenu_customer);
+        View headerView = nav.getHeaderView(0);
+        navTextName=headerView.findViewById(R.id.navheader_userName);
+        navProfilePic=headerView.findViewById(R.id.navheader_image);
+
         drawerLayout=findViewById(R.id.drawer_customer);
 
         toggle=new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.open,R.string.close);
 
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
+
 
         nav.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -148,7 +153,6 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     case R.id.menu_logout :
                         mAuth.signOut();
                         logOutCustomer();
-                        drawerLayout.closeDrawer(GravityCompat.START);
                         break;
 
                     case R.id.menu_setting :
@@ -280,6 +284,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
             }
         });
 
+        getNavHeaderUserInformation();
     }
 
 
@@ -590,5 +595,33 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         a.addCategory(Intent.CATEGORY_HOME);
         a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(a);
+    }
+    private void getNavHeaderUserInformation()
+    {
+        DatabaseReference databaseReference;
+        databaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers");
+        databaseReference.child(mAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                if (dataSnapshot.exists()  &&  dataSnapshot.getChildrenCount() > 0)
+                {
+                    String name = dataSnapshot.child("name").getValue().toString();
+                    String phone = dataSnapshot.child("phone").getValue().toString();
+
+                    navTextName.setText(name);
+                    if (dataSnapshot.hasChild("image"))
+                    {
+                        String image = dataSnapshot.child("image").getValue().toString();
+                        Picasso.get().load(image).into(navProfilePic);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }

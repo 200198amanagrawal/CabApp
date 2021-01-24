@@ -10,6 +10,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -21,9 +22,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 
 import com.directions.route.AbstractRouting;
@@ -50,6 +55,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -79,8 +85,8 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private String driverID, customerID = "";
     private Marker customerMarker;
     private ValueEventListener assignedCustomerPickupLocationRefListener;
-    private TextView txtName, txtPhone, customerDestination;
-    private CircleImageView profilePic;
+    private TextView txtName, txtPhone, customerDestination,navTextName;
+    private CircleImageView profilePic,navProfilePic;
     private RelativeLayout relativeLayout;
     private FusedLocationProviderClient mFusedLocationClient;
     private List<Polyline> polylines;
@@ -91,18 +97,60 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private float rideDistance;
     private ImageView topDownImageCustomerInfo;
     private BottomSheetBehavior bottomSheetBehaviorCustomerInfo;
+    private NavigationView nav;
+    private ActionBarDrawerToggle toggle;
+    private DrawerLayout drawerLayout;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_map);
+        toolbar= findViewById(R.id.toolbar_driver);
 
-        Button driverLogout = findViewById(R.id.driver_logout_btn);
-        Button driverSettings = findViewById(R.id.driver_setting_btn);
+        nav=findViewById(R.id.navmenu_driver);
+        View headerView = nav.getHeaderView(0);
+        navTextName= headerView.findViewById(R.id.navheader_userName);
+        navProfilePic=headerView.findViewById(R.id.navheader_image);
+
+        drawerLayout=findViewById(R.id.drawer_driver);
+
+        toggle=new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.open,R.string.close);
+
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        nav.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem)
+            {
+                switch (menuItem.getItemId())
+                {
+                    case R.id.menu_history :
+                        Intent intent = new Intent(DriverMapActivity.this, HistoryActivity.class);
+                        intent.putExtra("customerOrDriver", "Drivers");
+                        startActivity(intent);
+                        break;
+
+                    case R.id.menu_logout :
+                        currentLogOutDriverStatus = true;
+                        disconnectDriver();
+                        mAuth.signOut();
+                        logOutDriver();
+                        break;
+
+                    case R.id.menu_setting :
+                        Intent intentSeeting = new Intent(DriverMapActivity.this, SettingsActivity.class);
+                        intentSeeting.putExtra("type", "Drivers");
+                        startActivity(intentSeeting);
+                        break;
+                }
+
+                return true;
+            }
+        });
         mAuth = FirebaseAuth.getInstance();
         driverID = mAuth.getCurrentUser().getUid();
-
-        Button mHistory = findViewById(R.id.historyDriver);
 
         polylines = new ArrayList<>();
 
@@ -120,24 +168,6 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
         mapFragment.getMapAsync(this);
 
-        driverSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(DriverMapActivity.this, SettingsActivity.class);
-                intent.putExtra("type", "Drivers");
-                startActivity(intent);
-            }
-        });
-
-        driverLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                currentLogOutDriverStatus = true;
-                disconnectDriver();
-                mAuth.signOut();
-                logOutDriver();
-            }
-        });
 
         mRideStatus = findViewById(R.id.rideStatus);
 
@@ -159,16 +189,6 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                         endRide();
                         break;
                 }
-            }
-        });
-
-        mHistory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(DriverMapActivity.this, HistoryActivity.class);
-                intent.putExtra("customerOrDriver", "Drivers");
-                startActivity(intent);
-                return;
             }
         });
 
@@ -206,6 +226,8 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
             }
         });
         getAssignedCustomerRequest();
+
+        getNavHeaderUserInformation();
     }
 
     private void recordRide() {
@@ -586,5 +608,34 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         a.addCategory(Intent.CATEGORY_HOME);
         a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(a);
+    }
+
+    private void getNavHeaderUserInformation()
+    {
+        DatabaseReference databaseReference;
+        databaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers");
+        databaseReference.child(mAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                if (dataSnapshot.exists()  &&  dataSnapshot.getChildrenCount() > 0)
+                {
+                    String name = dataSnapshot.child("name").getValue().toString();
+                    String phone = dataSnapshot.child("phone").getValue().toString();
+
+                    navTextName.setText(name);
+                    if (dataSnapshot.hasChild("image"))
+                    {
+                        String image = dataSnapshot.child("image").getValue().toString();
+                        Picasso.get().load(image).into(navProfilePic);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }
